@@ -8,3 +8,4 @@ pub mod obj;
 pub mod upvalue;
 pub mod opcode;
 pub mod env;
+pub mod interpreter;

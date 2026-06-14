@@ -1,13 +1,13 @@
 use crate::token::Literal;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum BinOp {
     Add, Sub, Mul, Div,
     Eq, Ne, Lt, Le, Gt, Ge,
     And, Or,
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum UnaryOp {
     Neg, Not,
 }
