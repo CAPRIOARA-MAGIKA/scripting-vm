@@ -1,0 +1,4 @@
+print "a" + "b";
+var s = "hi";
+print s;
+print "x" + s + "y";

@@ -55,3 +55,11 @@ pub fn run_vm(path: &Path) -> String {
     }
     vm.output.join("\n")
 }
+
+#[allow(dead_code)]
+pub fn debug_run(label: &str, path: &Path) {
+    println!("== {} interpreter ==", label);
+    println!("{}", run_interpreter(path));
+    println!("== {} vm ==", label);
+    println!("{}", run_vm(path));
+}

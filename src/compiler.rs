@@ -495,23 +495,21 @@ impl Compiler {
                 self.expr(left)?;
                 match op {
                     BinOp::Or => {
-                        // if left truthy, keep; else evaluate right.
-                        // JumpIfFalse pops; but for `or` we want short-circuit without pop.
-                        // Use JumpIfFalse that copies, or restructure.
-                        // Simple approach: emit a jump over the right-side evaluation,
-                        // and if we don't jump, pop left and evaluate right.
-                        let j = self.emit_jump(OpCode::JumpIfFalse, 0);
-                        // We didn't jump, so left is truthy. Pop the left value and evaluate right.
+                        // If left is truthy, keep it and skip the right-hand evaluation.
+                        let else_jump = self.emit_jump(OpCode::JumpIfFalse, 0);
+                        let end_jump = self.emit_jump(OpCode::Jump, 0);
+                        self.patch_jump(else_jump)?;
+                        // Left was false: pop it and evaluate right.
                         self.emit_op(OpCode::Pop, 0);
                         self.expr(right)?;
-                        self.patch_jump(j)?;
-                        // If we did jump, the false value is on the stack.
+                        self.patch_jump(end_jump)?;
                     }
                     BinOp::And => {
-                        let j = self.emit_jump(OpCode::JumpIfFalse, 0);
+                        // If left is false, keep it and skip the right-hand evaluation.
+                        let end_jump = self.emit_jump(OpCode::JumpIfFalse, 0);
                         self.emit_op(OpCode::Pop, 0);
                         self.expr(right)?;
-                        self.patch_jump(j)?;
+                        self.patch_jump(end_jump)?;
                     }
                     _ => unreachable!(),
                 }
