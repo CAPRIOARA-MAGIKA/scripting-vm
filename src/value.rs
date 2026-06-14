@@ -4,12 +4,15 @@ use std::rc::Rc;
 
 use crate::obj::{Obj, ObjKind};
 
+pub type NativeFn = fn(&[Value]) -> Result<Value, String>;
+
 #[derive(Debug, Clone)]
 pub enum Value {
     Number(f64),
     Bool(bool),
     Nil,
     Obj(Rc<RefCell<Obj>>),
+    Native(NativeFn),
 }
 
 impl PartialEq for Value {
@@ -54,6 +57,7 @@ impl Value {
                     _ => false,
                 }
             }
+            (Value::Native(a), Value::Native(b)) => std::ptr::fn_addr_eq(*a, *b),
             _ => false,
         }
     }
@@ -78,6 +82,7 @@ impl fmt::Display for Value {
                     _ => write!(f, "<object>"),
                 }
             }
+            Value::Native(_) => write!(f, "<native fn>"),
         }
     }
 }

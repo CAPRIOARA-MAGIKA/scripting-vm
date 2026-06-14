@@ -9,3 +9,4 @@ pub mod upvalue;
 pub mod opcode;
 pub mod env;
 pub mod interpreter;
+pub mod native;
