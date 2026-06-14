@@ -55,5 +55,5 @@ Each upvalue is a `Rc<RefCell<Upvalue>>`. Upvalues have two states:
 ## Errors
 
 - Compile errors halt at parse or compile time
-- Runtime errors propagate up the call stack; the VM prints a stack trace with function names and line numbers
+- Runtime errors propagate up the call stack; the VM prints a stack trace with function names. Per-byte line tracking is wired in but the compiler currently emits `0` for every opcode's line (a v1 simplification); the runtime therefore reports `line 0` for runtime errors. Compile errors do carry correct line numbers. See `docs/known-limitations.md`.
 - No `unwrap()` on user input paths

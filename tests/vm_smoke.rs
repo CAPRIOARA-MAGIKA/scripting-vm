@@ -64,3 +64,32 @@ fn vm_runs_closure_counter() {
     vm.run(func).unwrap();
     assert_eq!(vm.output.join("|"), "1|2|3");
 }
+
+#[test]
+fn vm_runs_multi_level_closure() {
+    // Regression: capturing a variable through two levels of nested closures.
+    // The innermost closure must read and write the outer function's local.
+    let src = r#"
+        fn outer() {
+          var x = 5;
+          fn middle() {
+            fn inner() {
+              x = x + 1;
+              return x;
+            }
+            return inner;
+          }
+          return middle;
+        }
+        var f = outer()();
+        print f();   // 6
+        print f();   // 7
+    "#;
+    let toks = Lexer::new(src).scan_tokens().unwrap();
+    let prog = Parser::new(toks).parse().unwrap();
+    let c = Compiler::new();
+    let func = c.compile(&prog).unwrap();
+    let mut vm = VM::new();
+    vm.run(func).unwrap();
+    assert_eq!(vm.output.join("|"), "6|7");
+}

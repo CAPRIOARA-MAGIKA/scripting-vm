@@ -1,6 +1,5 @@
 use crate::ast::*;
 use crate::error::CompileError;
-use crate::lexer::Lexer;
 use crate::token::{Token, TokenType};
 
 pub struct Parser {
@@ -361,6 +360,7 @@ impl Parser {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::lexer::Lexer;
     use crate::token::Literal;
 
     fn parse(src: &str) -> Program {

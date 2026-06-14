@@ -18,9 +18,9 @@ The compiler is single-pass. No constant folding, no peephole, no register alloc
 
 `print` (as a statement) and `clock` (as a global native) only. A `String` type and a small stdlib are future work.
 
-## No source maps
+## Runtime error line numbers are 0
 
-Errors include line numbers. They do not include column numbers or snippet excerpts. The line table is one entry per emitted byte, which is enough to attribute runtime errors to a source line.
+The compiler's `Chunk` carries a per-byte line table, but the compiler currently emits `0` for every opcode's line (a v1 simplification that avoids threading source-line metadata through the entire AST). Compile errors (from the parser) do report correct line numbers, and the per-byte table is there ready to be populated, but runtime errors report `at <fn> (line 0)`. Threading `line: usize` through every `Expr` and `Stmt` variant is a mechanical refactor; deferred to v2.
 
 ## No debug protocol
 
@@ -34,6 +34,6 @@ Locals, constants, and upvalues are all addressed with 1-byte indices. Functions
 
 The tree-walking reference interpreter handles everything except `Call` expressions, which it errors on with `"function call not yet implemented for interpreter"`. The VM is the only execution path for programs that use functions. The parity test suite is scoped to features both paths implement.
 
-## Non-local upvalues not supported
+## Non-local upvalues
 
-The compiler captures upvalues that are locals in the *immediate* enclosing function. Multi-level upvalue chains (where a closure captures another closure's local) are not implemented in v1 — the VM panics with "non-local upvalues not supported in v1" if it encounters one.
+Multi-level upvalue capture is implemented and tested. A closure inside a closure inside a function correctly reads and writes the outermost local.

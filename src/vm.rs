@@ -82,31 +82,6 @@ impl VM {
         })
     }
 
-    fn frame_function_obj(&self) -> std::cell::Ref<'_, Obj> {
-        let fr = self.frames.last().unwrap();
-        fr.function.borrow()
-    }
-
-    fn frame_name(&self) -> String {
-        let f = self.frame_function_obj();
-        match &f.kind {
-            ObjKind::Function(fo) => fo.name.clone(),
-            _ => "<script>".into(),
-        }
-    }
-
-    fn line_at(&self, ip: usize) -> usize {
-        if let Some(fr) = self.frames.last() {
-            let f = fr.function.borrow();
-            if let ObjKind::Function(fo) = &f.kind {
-                if let Some(chunk) = &fo.chunk {
-                    return chunk.lines.get(ip).copied().unwrap_or(0);
-                }
-            }
-        }
-        0
-    }
-
     fn read_byte(&mut self) -> u8 {
         let ip = self.frames.last().unwrap().ip;
         let b = self.frame_chunk().code[ip];
@@ -378,40 +353,13 @@ impl VM {
                                 let slot = self.frames.last().unwrap().slots_offset + idx;
                                 upvalues.push(self.capture_upvalue(slot));
                             } else {
-                                // Non-local upvalue from enclosing closure.
+                                // Non-local upvalue: take the runtime upvalue cell
+                                // from the current frame's closure. That cell is
+                                // the same Rc<RefCell<Upvalue>> the enclosing
+                                // function uses, so the new closure shares state
+                                // with its grandparent.
                                 let fr = self.frames.last().unwrap();
-                                let f = fr.function.borrow();
-                                let enclosing_fo = match &f.kind {
-                                    ObjKind::Function(fo) => fo,
-                                    _ => unreachable!(),
-                                };
-                                let enc_uv = enclosing_fo.upvalues[idx].clone();
-                                drop(f);
-                                // Find or create a shared Rc<RefCell<Upvalue>>.
-                                let shared = if let Some(existing) = self
-                                    .open_upvalues
-                                    .iter()
-                                    .find(|uv| {
-                                        let b = uv.borrow();
-                                        b.index == enc_uv.index as usize
-                                            && b.is_open
-                                            && /* is_local flag */ enc_uv.is_local
-                                    })
-                                    .cloned()
-                                {
-                                    existing
-                                } else {
-                                    // Take the value from the enclosing stack slot.
-                                    let val = self.stack
-                                        [self.frames.last().unwrap().slots_offset + enc_uv.index as usize]
-                                        .clone();
-                                    let closed = Rc::new(RefCell::new(Upvalue {
-                                        index: enc_uv.index as usize,
-                                        is_open: false,
-                                        value: val,
-                                    }));
-                                    closed
-                                };
+                                let shared = fr.upvalues[idx].clone();
                                 upvalues.push(shared);
                             }
                         }

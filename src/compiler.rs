@@ -318,7 +318,9 @@ impl Compiler {
                 Ok(())
             }
             Stmt::Fn { name, params, body } => {
-                let g = self.resolve_global(name);
+                // Register the global slot for the function name. The index is
+                // looked up by emit_name later; this call is for its side effect.
+                self.resolve_global(name);
                 // Compile the function body in a sub-compiler.
                 let arity = params.len() as u8;
                 let mut sub = Compiler::new_sub(

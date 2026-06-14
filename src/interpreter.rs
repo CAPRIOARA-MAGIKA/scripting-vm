@@ -161,9 +161,8 @@ impl Interpreter {
             }
             Expr::Call { callee, args } => {
                 let callee_v = self.eval(callee, env.clone())?;
-                let arg_vals: Result<Vec<Value>, RuntimeError> =
+                let _: Result<Vec<Value>, RuntimeError> =
                     args.iter().map(|a| self.eval(a, env.clone())).collect();
-                let arg_vals = arg_vals?;
                 match callee_v {
                     Value::Obj(o) => {
                         let o = o.borrow();
