@@ -1,0 +1,14 @@
+// Closures capture enclosing locals by reference.
+fn makeCounter() {
+  var i = 0;
+  fn tick() {
+    i = i + 1;
+    return i;
+  }
+  return tick;
+}
+
+var c = makeCounter();
+print c();   // 1
+print c();   // 2
+print c();   // 3

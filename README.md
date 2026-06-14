@@ -1,0 +1,91 @@
+# scripting-vm
+
+A small, complete, Lox-style dynamic scripting language with a stack-based bytecode VM. Written in Rust. Portfolio piece.
+
+## What it is
+
+A from-scratch implementation of a language pipeline: source → tokens → AST → bytecode → execution. Two execution paths exist — a tree-walking reference and the bytecode VM — and an end-to-end parity test suite asserts they agree on every program.
+
+## What's implemented
+
+- Lexer with line tracking
+- Recursive-descent parser with Pratt precedence
+- Tree-walking interpreter (reference)
+- Single-pass AST → bytecode compiler
+- Stack-based VM with closures and upvalues
+- Dynamic typing, first-class functions, recursion
+- REPL and `run` subcommand
+- Parity test suite: 14 `.lang` programs run through both paths, output must match
+
+## What's not implemented (v1)
+
+- Classes, inheritance, `this`, `super`
+- Tracing garbage collector (uses `Rc`; cycles leak — see [known limitations](docs/known-limitations.md))
+- Standard library beyond `print` and `clock`
+- Optimization passes
+- Debug protocol
+
+## Build & run
+
+```bash
+cargo build --release
+cargo run -- run examples/hello.lang
+cargo run -- repl
+```
+
+## Run tests
+
+```bash
+cargo test
+```
+
+The parity test (`tests/parity.rs`) is the key check — when both executors produce identical output on all 14 programs, the VM matches the reference.
+
+## Project layout
+
+```
+src/
+  lexer.rs       source -> tokens
+  parser.rs      tokens -> AST
+  ast.rs         AST types
+  value.rs       runtime values
+  obj.rs         heap objects
+  env.rs         lexical scopes
+  interpreter.rs tree-walking reference
+  compiler.rs    AST -> bytecode
+  opcode.rs      opcode set + Chunk
+  upvalue.rs     closure capture
+  vm.rs          stack machine
+  native.rs      built-in functions
+  main.rs        CLI
+tests/cases/*.lang  parity test programs
+```
+
+## Architecture
+
+See [docs/architecture.md](docs/architecture.md). Opcode reference: [docs/bytecode.md](docs/bytecode.md).
+
+## Example
+
+```rust
+fn fib(n) {
+  if (n < 2) { return n; }
+  return fib(n - 1) + fib(n - 2);
+}
+print fib(10);  // 55
+```
+
+```rust
+fn makeCounter() {
+  var i = 0;
+  fn tick() {
+    i = i + 1;
+    return i;
+  }
+  return tick;
+}
+var c = makeCounter();
+print c();  // 1
+print c();  // 2
+print c();  // 3
+```

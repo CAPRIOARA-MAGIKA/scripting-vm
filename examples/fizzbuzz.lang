@@ -1,0 +1,11 @@
+// FizzBuzz from 1 to 15. v1 has no modulo; we count cycles with helpers.
+var n = 1;
+var mod3 = 0;
+var mod5 = 0;
+while (n <= 15) {
+  if (mod3 == 2 and mod5 == 4) { print "FizzBuzz"; mod3 = 0; mod5 = 0; }
+  else if (mod3 == 2)          { print "Fizz";      mod3 = 0; mod5 = mod5 + 1; }
+  else if (mod5 == 4)          { print "Buzz";      mod3 = mod3 + 1; mod5 = 0; }
+  else                         { print n;           mod3 = mod3 + 1; mod5 = mod5 + 1; }
+  n = n + 1;
+}
