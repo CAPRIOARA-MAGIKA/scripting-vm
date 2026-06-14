@@ -16,3 +16,11 @@ impl Upvalue {
         }
     }
 }
+
+/// Compile-time upvalue reference: either a local slot in the enclosing
+/// function, or an upvalue index in the enclosing function's upvalue list.
+#[derive(Debug, Clone, Copy)]
+pub struct UpvalueRef {
+    pub index: u8,
+    pub is_local: bool,
+}
