@@ -3,3 +3,7 @@ pub mod lexer;
 pub mod ast;
 pub mod error;
 pub mod parser;
+pub mod value;
+pub mod obj;
+pub mod upvalue;
+pub mod opcode;
