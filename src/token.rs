@@ -36,6 +36,7 @@ impl TokenType {
             "if" => Some(TokenType::If),
             "nil" => Some(TokenType::Nil),
             "or" => Some(TokenType::Or),
+            "print" => Some(TokenType::Print),
             "return" => Some(TokenType::Return),
             "super" => Some(TokenType::Super),
             "this" => Some(TokenType::This),
