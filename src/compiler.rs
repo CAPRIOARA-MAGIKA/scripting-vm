@@ -129,13 +129,7 @@ impl Compiler {
 
     fn emit_constant(&mut self, v: Value, line: usize) -> Result<u8, CompileError> {
         let c = self.current_chunk();
-        let idx = c.add_constant(v);
-        if idx > 0xff {
-            return Err(CompileError {
-                line,
-                message: "too many constants".into(),
-            });
-        }
+        let idx = c.add_constant(v)?;
         self.emit_op(OpCode::Constant, line);
         self.emit_byte(idx, line);
         Ok(idx)
@@ -156,7 +150,7 @@ impl Compiler {
         let slot = self.locals.len() as u8;
         self.locals.push(Local {
             name,
-            depth: -1,
+            depth: self.scope_depth,
             is_captured: false,
         });
         Ok(slot)
@@ -207,6 +201,13 @@ impl Compiler {
         let i = self.globals.len() as u8;
         self.globals.insert(name.to_string(), i);
         i
+    }
+
+    /// Add a string constant and return its index, WITHOUT emitting a Constant opcode.
+    /// Used as the operand of DefineGlobal / GetGlobal / SetGlobal, which expect a
+    /// 1-byte constant index in the bytecode stream.
+    fn emit_name(&mut self, name: &str) -> Result<u8, CompileError> {
+        self.current_chunk().add_constant(Value::from_string(name.to_string()))
     }
 
     fn begin_scope(&mut self) {
@@ -260,14 +261,14 @@ impl Compiler {
                         self.emit_op(OpCode::Nil, 0);
                     }
                 } else {
-                    let g = self.resolve_global(name);
                     if let Some(e) = init {
                         self.expr(e)?;
                     } else {
                         self.emit_op(OpCode::Nil, 0);
                     }
                     self.emit_op(OpCode::DefineGlobal, 0);
-                    self.emit_byte(g, 0);
+                    let idx = self.emit_name(name)?;
+                    self.emit_byte(idx, 0);
                 }
                 Ok(())
             }
@@ -355,6 +356,7 @@ impl Compiler {
                         name: sub.function.name.clone(),
                         arity: sub.function.arity,
                         chunk: Some(sub.function.chunk.clone()),
+                        upvalues: sub.function.upvalues.clone(),
                     }),
                 })));
 
@@ -368,7 +370,8 @@ impl Compiler {
                 }
 
                 self.emit_op(OpCode::DefineGlobal, 0);
-                self.emit_byte(g, 0);
+                let idx = self.emit_name(name)?;
+                self.emit_byte(idx, 0);
                 Ok(())
             }
         }
@@ -412,9 +415,9 @@ impl Compiler {
                     self.emit_op(OpCode::GetUpvalue, 0);
                     self.emit_byte(uv, 0);
                 } else {
-                    let g = self.resolve_global(name);
                     self.emit_op(OpCode::GetGlobal, 0);
-                    self.emit_byte(g, 0);
+                    let idx = self.emit_name(name)?;
+                    self.emit_byte(idx, 0);
                 }
                 Ok(())
             }
@@ -427,9 +430,9 @@ impl Compiler {
                     self.emit_op(OpCode::SetUpvalue, 0);
                     self.emit_byte(uv, 0);
                 } else {
-                    let g = self.resolve_global(name);
                     self.emit_op(OpCode::SetGlobal, 0);
-                    self.emit_byte(g, 0);
+                    let idx = self.emit_name(name)?;
+                    self.emit_byte(idx, 0);
                 }
                 Ok(())
             }

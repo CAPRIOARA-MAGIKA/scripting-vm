@@ -11,3 +11,4 @@ pub mod env;
 pub mod interpreter;
 pub mod native;
 pub mod compiler;
+pub mod vm;

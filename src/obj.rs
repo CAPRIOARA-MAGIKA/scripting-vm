@@ -1,8 +1,7 @@
 use crate::opcode::Chunk;
+use crate::upvalue::{Upvalue, UpvalueRef};
 use std::cell::RefCell;
 use std::rc::Rc;
-
-use crate::upvalue::Upvalue;
 
 #[derive(Debug)]
 pub struct Obj {
@@ -22,6 +21,7 @@ pub struct FunctionObj {
     pub name: String,
     pub arity: u8,
     pub chunk: Option<Chunk>,
+    pub upvalues: Vec<UpvalueRef>,
 }
 
 #[derive(Clone, Debug)]

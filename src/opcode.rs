@@ -108,9 +108,16 @@ impl Chunk {
         self.lines.push(line);
     }
 
-    pub fn add_constant(&mut self, v: Value) -> u8 {
+    pub fn add_constant(&mut self, v: Value) -> Result<u8, crate::error::CompileError> {
+        if self.constants.len() >= u8::MAX as usize {
+            return Err(crate::error::CompileError {
+                line: 0,
+                message: "too many constants in one chunk".into(),
+            });
+        }
+        let idx = self.constants.len() as u8;
         self.constants.push(v);
-        (self.constants.len() - 1) as u8
+        Ok(idx)
     }
 }
 
@@ -121,7 +128,7 @@ mod tests {
     #[test]
     fn chunk_writes_and_reads() {
         let mut c = Chunk::new();
-        let k = c.add_constant(crate::value::Value::Number(7.0));
+        let k = c.add_constant(crate::value::Value::Number(7.0)).unwrap();
         c.write(OpCode::Constant, 1);
         c.write_byte(k, 1);
         c.write(OpCode::Return, 1);
