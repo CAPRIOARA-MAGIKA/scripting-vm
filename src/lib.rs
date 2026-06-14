@@ -7,3 +7,4 @@ pub mod value;
 pub mod obj;
 pub mod upvalue;
 pub mod opcode;
+pub mod env;
