@@ -1,0 +1,14 @@
+[package]
+name = "scripting-vm"
+version = "0.1.0"
+edition = "2021"
+description = "A Lox-style dynamic scripting language with a stack-based bytecode VM"
+license = "MIT"
+
+[[bin]]
+name = "scripting-vm"
+path = "src/main.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
