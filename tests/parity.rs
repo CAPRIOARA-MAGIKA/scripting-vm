@@ -26,3 +26,10 @@ fn check(name: &str) {
 #[test] fn parity_scope()       { check("scope.lang"); }
 #[test] fn parity_global_reassign() { check("global_reassign.lang"); }
 #[test] fn parity_stress()      { check("stress.lang"); }
+#[test] fn parity_nested_blocks()   { check("nested_blocks.lang"); }
+#[test] fn parity_multi_assign()    { check("multi_assign.lang"); }
+#[test] fn parity_chained_cmp()     { check("chained_cmp.lang"); }
+#[test] fn parity_empty()           { check("empty.lang"); }
+#[test] fn parity_mixed_operands()  { check("mixed_operands.lang"); }
+#[test] fn parity_nested_loops()    { check("nested_loops.lang"); }
+#[test] fn parity_deep_nesting()    { check("deep_nesting.lang"); }

@@ -1,0 +1,9 @@
+// Repeated assignment to the same global.
+var x = 1;
+print x;
+x = 2;
+print x;
+x = 3 + 4;
+print x;
+x = x + 1;
+print x;

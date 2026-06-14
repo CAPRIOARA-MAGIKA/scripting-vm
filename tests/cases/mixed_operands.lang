@@ -1,0 +1,6 @@
+// Number and string concatenation. Mixed-type + is not supported in v1.
+print 1 + 2;
+print "hello" + " " + "world";
+print "" + "";
+print "a" + "b" + "c" + "d";
+print 10 + 20 + 30;

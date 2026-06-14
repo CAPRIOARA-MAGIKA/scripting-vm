@@ -1,0 +1,8 @@
+// Deeply nested if-else chain.
+var n = 5;
+if (n < 1) { print "lt1"; }
+else if (n < 2) { print "lt2"; }
+else if (n < 3) { print "lt3"; }
+else if (n < 4) { print "lt4"; }
+else if (n < 5) { print "lt5"; }
+else { print "gte5"; }
