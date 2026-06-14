@@ -17,7 +17,7 @@ pub enum TokenType {
 
     // Keywords
     And, Break, Class, Continue, Else, False, Fn, For, If, Nil, Or,
-    Return, Super, This, True, Var, While,
+    Print, Return, Super, This, True, Var, While,
 
     EOF,
 }
