@@ -81,6 +81,10 @@ tests/cases/*.lang  parity test programs
 
 See [docs/architecture.md](docs/architecture.md). Opcode reference: [docs/bytecode.md](docs/bytecode.md).
 
+## Disclaimer
+
+This project was designed and built strictly for educational and portfolio purposes; it is not intended for commercial use. To ensure high quality, an LLM was utilized for code review, test design, and polishing the documentation.
+
 ## Example
 
 ```rust
